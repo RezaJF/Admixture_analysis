@@ -1,0 +1,47 @@
+---
+title: "Admixture plots"
+output: html_notebook
+---
+
+```{r}
+library("ggplot2")
+setwd("/Users/rezajabal/Documents/Centnarian_analysis/ADMIXTUR")
+
+cv= read.csv("CV_error", sep = "\t")
+ggplot(cv, aes(K, CV_Error))+geom_point()+
+  geom_line(aes(y=CV_Error),linetype="dotted")+
+  scale_x_continuous(breaks = seq(min(df$K), max(df$K), by=1))+
+  theme_classic()
+```
+
+Plotting the admixture bar-plots for the K with lowest cross-validation error:
+
+```{r}
+library(tidyverse)
+
+
+plot_data <- tbl %>% 
+    mutate(id = row_number()) %>% 
+    gather('pop', 'prob', V1:V4) %>% 
+    group_by(id) %>% 
+    mutate(likely_assignment = pop[which.max(prob)],
+           assingment_prob = max(prob)) %>% 
+    arrange(likely_assignment, desc(assingment_prob)) %>% 
+    ungroup() %>% 
+    mutate(id = forcats::fct_inorder(factor(id)))
+
+ggplot(plot_data, aes(id, prob, fill = pop)) +
+  geom_col() +
+  facet_grid(~likely_assignment, scales = 'free', space = 'free')+
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+```
+
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
